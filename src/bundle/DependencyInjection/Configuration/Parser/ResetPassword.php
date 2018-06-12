@@ -12,7 +12,7 @@ use eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\AbstractPars
 use eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\SiteAccessAware\ContextualizerInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-class ChangePassword extends AbstractParser
+class ResetPassword extends AbstractParser
 {
     /**
      * Adds semantic configuration definition.
@@ -22,17 +22,20 @@ class ChangePassword extends AbstractParser
     public function addSemanticConfig(NodeBuilder $nodeBuilder)
     {
         $nodeBuilder
-            ->arrayNode('user_change_password')
-                ->info('User change password configuration')
+            ->arrayNode('user_reset_password')
+                ->info('User reset password configuration')
                 ->children()
                     ->arrayNode('templates')
                         ->info('User change password templates.')
                         ->children()
                             ->scalarNode('form')
-                                ->info('Template to use for change password form rendering.')
+                                ->info('Template to use for reset password form rendering.')
+                            ->end()
+                            ->scalarNode('invalid_link')
+                                ->info('Template to use for invalid password link rendering.')
                             ->end()
                             ->scalarNode('success')
-                                ->info('Template to use for change password confirmation rendering.')
+                                ->info('Template to use for reset password confirmation rendering.')
                             ->end()
                         ->end()
                     ->end()
@@ -42,23 +45,31 @@ class ChangePassword extends AbstractParser
 
     public function mapConfig(array &$scopeSettings, $currentScope, ContextualizerInterface $contextualizer)
     {
-        if (empty($scopeSettings['user_change_password'])) {
+        if (empty($scopeSettings['user_reset_password'])) {
             return;
         }
 
-        $settings = $scopeSettings['user_change_password'];
+        $settings = $scopeSettings['user_reset_password'];
 
         if (!empty($settings['templates']['form'])) {
             $contextualizer->setContextualParameter(
-                'user_change_password.templates.form',
+                'user_reset_password.templates.form',
                 $currentScope,
                 $settings['templates']['form']
             );
         }
 
+        if (!empty($settings['templates']['invalid_link'])) {
+            $contextualizer->setContextualParameter(
+                'user_reset_password.templates.invalid_link',
+                $currentScope,
+                $settings['templates']['invalid_link']
+            );
+        }
+
         if (!empty($settings['templates']['success'])) {
             $contextualizer->setContextualParameter(
-                'user_change_password.templates.success',
+                'user_reset_password.templates.success',
                 $currentScope,
                 $settings['templates']['success']
             );
